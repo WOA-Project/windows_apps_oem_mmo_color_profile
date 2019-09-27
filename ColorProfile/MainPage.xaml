@@ -1,0 +1,144 @@
+﻿<Page
+    x:Class="ColorProfile.MainPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:ColorProfile"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto" VerticalScrollMode="Auto">
+        <StackPanel>
+            <StackPanel Padding="24,24,24,0">
+                <TextBlock x:Name="TitleTextBlock" Padding="0,0,0,8" Text="Color profile" FontWeight="Bold" FontSize="24" TextWrapping="Wrap"/>
+                <RichTextBlock Padding="0,0,0,32">
+                    <Paragraph>
+                        <Run Text="To make other display adjustments, "/>
+                        <Hyperlink NavigateUri="ms-settings:display" UnderlineStyle="None">
+                            <Run Text="go to Settings."/>
+                        </Hyperlink>
+                    </Paragraph>
+                </RichTextBlock>
+
+                <StackPanel Padding="0,0,0,16" Orientation="Horizontal">
+                    <FontIcon Glyph="&#xE713;" Margin="0,1,14,0"/>
+                    <TextBlock Text="General" FontSize="18" TextWrapping="Wrap" FontWeight="Bold"/>
+                </StackPanel>
+            </StackPanel>
+
+            <Grid Padding="24,0" HorizontalAlignment="Stretch">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="auto"/>
+                </Grid.ColumnDefinitions>
+
+                <ToggleSwitch x:Name="SunlightReadabilityToggle" Grid.Column="1" OnContent="" OffContent="" Width="50" Toggled="SunlightReadabilityToggle_Toggled"/>
+
+                <StackPanel Grid.Column="0" Margin="0,0,32,0">
+                    <TextBlock Text="Sunlight readability"/>
+                    <TextBlock Text="Improves screen readability in bright sunlight" Opacity="0.75" TextWrapping="Wrap"/>
+                </StackPanel>
+            </Grid>
+
+            <Grid Padding="24,24,24,0" HorizontalAlignment="Stretch">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="auto"/>
+                </Grid.ColumnDefinitions>
+
+                <ToggleSwitch x:Name="BatterySaverBrightnessToggle" Grid.Column="1" OnContent="" OffContent="" Width="50" Toggled="BatterySaverBrightnessToggle_Toggled"/>
+
+                <StackPanel Grid.Column="0" Margin="0,0,32,0">
+                    <TextBlock Text="Battery saver brightness"/>
+                    <TextBlock Text="Reduces screen brightness when battery saver is active" Opacity="0.75" TextWrapping="Wrap"/>
+                </StackPanel>
+            </Grid>
+
+            <StackPanel Padding="24,24,24,0">
+                <StackPanel Padding="0,0,0,16" Orientation="Horizontal">
+                    <FontIcon Glyph="&#xE790;" Margin="0,1,14,0"/>
+                    <TextBlock Text="Screen color profile" FontSize="18" TextWrapping="Wrap" FontWeight="Bold"/>
+                </StackPanel>
+            </StackPanel>
+
+            <StackPanel>
+                <ScrollViewer x:Name="ImageViewScrollViewer"
+            ManipulationMode="TranslateX"
+            IsHitTestVisible="True"
+            HorizontalScrollBarVisibility="Hidden"
+            VerticalScrollBarVisibility="Disabled">
+                    <ScrollViewer.Content>
+                        <Grid x:Name="ImageView">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <Grid.Resources>
+                                <Storyboard x:Name="ImageSlide" x:Key="ImageSlide" FillBehavior="HoldEnd">
+                                    <Storyboard.Children>
+                                        <DoubleAnimation x:Name="ImageSlideAnimation" Duration="0:0:0.25" EnableDependentAnimation="True" />
+                                    </Storyboard.Children>
+                                </Storyboard>
+                            </Grid.Resources>
+                            <Grid.Children>
+                                <Image x:Name="Picture1" Grid.Column="0" Stretch="UniformToFill" Source="ms-appx:///Assets/Images/1_WXGA_Color.jpg" Margin="4,0"/>
+                                <Image x:Name="Picture2" Grid.Column="1" Stretch="UniformToFill" Source="ms-appx:///Assets/Images/2_WXGA_Color.jpg" Margin="4,0"/>
+                                <Image x:Name="Picture3" Grid.Column="2" Stretch="UniformToFill" Source="ms-appx:///Assets/Images/3_WXGA_Color.jpg" Margin="4,0"/>
+                                <Image x:Name="Picture4" Grid.Column="3" Stretch="UniformToFill" Source="ms-appx:///Assets/Images/4_WXGA_Color.jpg" Margin="4,0"/>
+                            </Grid.Children>
+                        </Grid>
+                    </ScrollViewer.Content>
+                </ScrollViewer>
+            </StackPanel>
+
+            <StackPanel Padding="24">
+                <ComboBox x:Name="ProfileSelector" Header="Color profile" HorizontalAlignment="Stretch" SelectedIndex="0" SelectionChanged="ComboBox_SelectionChanged">
+                    <ComboBoxItem Content="Standard"/>
+                    <ComboBoxItem Content="Vivid"/>
+                    <ComboBoxItem Content="Cool"/>
+                    <ComboBoxItem Content="Advanced"/>
+                </ComboBox>
+            </StackPanel>
+
+            <StackPanel x:Name="AdvancedSliderPanel" Visibility="Collapsed">
+                <StackPanel Padding="24,0">
+                    <TextBlock Text="Color temperature"/>
+                    <Grid>
+                        <Slider x:Name="TemperatureSlider" ValueChanged="TemperatureSlider_ValueChanged" Margin="0,0,0,2" ManipulationMode="All" IsThumbToolTipEnabled="False" Maximum="100" Minimum="0" Value="50"/>
+                    </Grid>
+                    <Grid HorizontalAlignment="Stretch" Margin="0,4,0,20">
+                        <TextBlock HorizontalAlignment="Left" Text="Warm"/>
+                        <TextBlock HorizontalAlignment="Center" Text="Neutral"/>
+                        <TextBlock HorizontalAlignment="Right" Text="Cool"/>
+                    </Grid>
+                </StackPanel>
+
+                <StackPanel Padding="24,0">
+                    <TextBlock Text="Tint"/>
+                    <Grid>
+                        <Slider x:Name="TintSlider" ValueChanged="TintSlider_ValueChanged" Margin="0,0,0,2" ManipulationMode="All" IsThumbToolTipEnabled="False" Maximum="100" Minimum="0" Value="50"/>
+                    </Grid>
+                    <Grid HorizontalAlignment="Stretch" Margin="0,4,0,20">
+                        <TextBlock HorizontalAlignment="Left" Text="Green"/>
+                        <TextBlock HorizontalAlignment="Center" Text="Neutral"/>
+                        <TextBlock HorizontalAlignment="Right" Text="Purple"/>
+                    </Grid>
+                </StackPanel>
+
+                <StackPanel Padding="24,0">
+                    <TextBlock Text="Color saturation"/>
+                    <Grid>
+                        <Slider x:Name="SaturationSlider" ValueChanged="SaturationSlider_ValueChanged" Margin="0,0,0,2" ManipulationMode="All" IsThumbToolTipEnabled="False" Maximum="100" Minimum="0" Value="25"/>
+                    </Grid>
+                    <Grid HorizontalAlignment="Stretch" Margin="0,4,0,20">
+                        <TextBlock HorizontalAlignment="Left" Text="Natural"/>
+                        <TextBlock HorizontalAlignment="Right" Text="Vivid"/>
+                    </Grid>
+                </StackPanel>
+            </StackPanel>
+        </StackPanel>
+    </ScrollViewer>
+</Page>
