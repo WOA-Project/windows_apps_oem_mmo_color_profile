@@ -5,7 +5,7 @@ VisualStudioVersion = 16.0.29209.152
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ColorProfile", "ColorProfile.csproj", "{A634A609-8909-4835-A50B-298F960D604D}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RegistryRT", "..\..\..\Documents\GitHub\AdvancedInfo\RegistryRT\RegistryRT.vcxproj", "{84A7225C-2DAF-410D-AB85-282AB220A89F}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RegistryRT", "RegistryRT\RegistryRT.vcxproj", "{84A7225C-2DAF-410D-AB85-282AB220A89F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

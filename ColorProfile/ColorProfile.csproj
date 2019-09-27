@@ -212,7 +212,7 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Documents\GitHub\AdvancedInfo\RegistryRT\RegistryRT.vcxproj">
+    <ProjectReference Include="RegistryRT\RegistryRT.vcxproj">
       <Project>{84a7225c-2daf-410d-ab85-282ab220a89f}</Project>
       <Name>RegistryRT</Name>
     </ProjectReference>
