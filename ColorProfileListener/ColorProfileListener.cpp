@@ -8,14 +8,13 @@
 #include <string>
 #include <thread>
 #include <algorithm>
+#include "Profile.h"
 
 #define PROFILE_KEY_PATH L"Software\\Microsoft\\Windows NT\\CurrentVersion\\ICM\\ProfileAssociations\\Display\\{4d36e96e-e325-11ce-bfc1-08002be10318}\\0001"
 #define COLOR_AND_LIGHT_KEY_PATH L"SOFTWARE\\OEM\\Nokia\\Display\\ColorAndLight"
 
 #define BLUELIGHT_REDUCTION_KEY_PATH L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\CloudStore\\Store\\DefaultAccount\\Current\\default$windows.data.bluelightreduction.settings\\windows.data.bluelightreduction.settings"
 #define BLUELIGHT_REDUCTION_STATE_KEY_PATH L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\CloudStore\\Store\\DefaultAccount\\Current\\default$windows.data.bluelightreduction.bluelightreductionstate\\windows.data.bluelightreduction.bluelightreductionstate"
-
-#define CHANGE_COLOR_PROFILE_PATH L"\\Windows\\OEM\\ChangeColorProfile.exe"
 
 void CheckForBluelightReductionState();
 void CheckForSettings();
@@ -29,10 +28,12 @@ void NightModeSliderUpdated(int);
 void NightModeEnabled(int);
 void NightModeDisabled();
 
+void ChangeColorProfile(std::wstring);
+void ChangeColorProfileNightLight(double);
+bool ends_with(std::wstring const&, std::wstring const&);
+
 void CheckForProfileChangeFromExternal();
 void CheckForProfileChangeFromInternal();
-
-unsigned long long ExecuteProcess(std::wstring FullPathToExe, std::wstring Parameters, unsigned long SecondsToWait);
 
 std::wstring ReadSelectedProfile();
 
@@ -58,67 +59,6 @@ HKEY settingsKey = nullptr;
 
 HKEY profileKey = nullptr;
 HKEY colorAndLightKey = nullptr;
-
-// From http://goffconcepts.com/techarticles/createprocess.html
-
-unsigned long long ExecuteProcess(std::wstring FullPathToExe, std::wstring Parameters, unsigned long SecondsToWait)
-{
-	unsigned long long iMyCounter = 0, iReturnVal = 0, iPos = 0;
-	unsigned long long dwExitCode = 0;
-	std::wstring sTempStr = L"";
-
-	// Add a space to the beginning of the Parameters
-	if (Parameters.size() != 0)
-	{
-		if (Parameters[0] != L' ')
-		{
-			Parameters.insert(0, L" ");
-		}
-	}
-
-	// The first parameter needs to be the exe itself
-	sTempStr = FullPathToExe;
-	iPos = sTempStr.find_last_of(L"\\");
-	sTempStr.erase(0, iPos + 1);
-	Parameters = sTempStr.append(Parameters);
-
-	// CreateProcessW can modify Parameters thus we allocate needed memory
-	wchar_t* pwszParam = new wchar_t[Parameters.size() + 1];
-	if (pwszParam == 0)
-	{
-		return 1;
-	}
-	const wchar_t* pchrTemp = Parameters.c_str();
-	wcscpy_s(pwszParam, Parameters.size() + 1, pchrTemp);
-
-	/* CreateProcess API initialization */
-	STARTUPINFOW siStartupInfo;
-	PROCESS_INFORMATION piProcessInfo;
-	memset(&siStartupInfo, 0, sizeof(siStartupInfo));
-	memset(&piProcessInfo, 0, sizeof(piProcessInfo));
-	siStartupInfo.cb = sizeof(siStartupInfo);
-
-	if (CreateProcessW(const_cast<LPCWSTR>(FullPathToExe.c_str()), pwszParam, 0, 0, false, CREATE_DEFAULT_ERROR_MODE, 0, 0, &siStartupInfo, &piProcessInfo) != false)
-	{
-		// Watch the process.
-		dwExitCode = WaitForSingleObject(piProcessInfo.hProcess, SecondsToWait * 1000lu);
-	}
-	else
-	{
-		// CreateProcess failed
-		iReturnVal = GetLastError();
-	}
-
-	// Free memory
-	delete[]pwszParam;
-	pwszParam = 0;
-
-	// Release handles
-	CloseHandle(piProcessInfo.hProcess);
-	CloseHandle(piProcessInfo.hThread);
-
-	return iReturnVal;
-}
 
 std::wstring ReadSelectedProfile()
 {
@@ -232,7 +172,7 @@ void ProvisionProfileListData()
 		_nightlight = false;
 	}
 
-	if (profile != L"")
+	if (!profile.empty())
 	{
 		if (profile == _lastfoundprofile)
 		{
@@ -279,7 +219,7 @@ void EnableNightLight(unsigned long value)
 	const wchar_t sz[] = L"Night light.icm\0";
 	RegSetValueEx(profileKey, L"ICMProfile", NULL, REG_MULTI_SZ, (LPBYTE)sz, sizeof(sz));
 
-	ExecuteProcess(CHANGE_COLOR_PROFILE_PATH, std::to_wstring(value), 2);
+	ChangeColorProfileNightLight(value);
 }
 
 void DisableNightLight()
@@ -294,7 +234,7 @@ void DisableNightLight()
 	std::wstring tmpstring = ReadSelectedProfile();
 
 	_lastfoundprofile = tmpstring;
-	ExecuteProcess(CHANGE_COLOR_PROFILE_PATH, _lastfoundprofile, 2);
+	ChangeColorProfile(_lastfoundprofile);
 
 	_nightlight = false;
 }
@@ -307,7 +247,7 @@ int main()
 	RegOpenKeyEx(HKEY_CURRENT_USER, BLUELIGHT_REDUCTION_STATE_KEY_PATH, 0, KEY_NOTIFY | KEY_READ, &bluelightreductionStateKey);
 
 	RegOpenKeyEx(HKEY_CURRENT_USER, PROFILE_KEY_PATH, 0, KEY_ALL_ACCESS, &profileKey);
-	RegOpenKeyEx(HKEY_LOCAL_MACHINE, COLOR_AND_LIGHT_KEY_PATH, 0, KEY_ALL_ACCESS, &colorAndLightKey);
+	RegOpenKeyEx(HKEY_LOCAL_MACHINE, COLOR_AND_LIGHT_KEY_PATH, 0, KEY_ALL_ACCESS | KEY_WRITE, &colorAndLightKey);
 
 	ChangedEventSignal();
 
@@ -322,34 +262,6 @@ int main()
 
 	t3.join();
 	t4.join();
-
-	/*while (true)
-	{
-		if (!_nightlight)
-		{
-			std::wstring tmpstring = ReadSelectedProfile();
-
-			if (tmpstring == L"Night light.icm")
-			{
-				_nightlight = true;
-
-				const wchar_t sz[] = L"Night light.icm\0";
-				RegSetValueEx(profileKey, L"ICMProfile", NULL, REG_MULTI_SZ, (LPBYTE)sz, sizeof(sz));
-
-				continue;
-			}
-
-			if (_wcsicmp(_lastfoundprofile.c_str(), tmpstring.c_str()))
-			{
-				_lastfoundprofile = tmpstring;
-				ExecuteProcess(CHANGE_COLOR_PROFILE_PATH, _lastfoundprofile, 2);
-			}
-		}
-
-		ProvisionProfileListData();
-
-		Sleep(1000);
-	}*/
 }
 
 void CheckForProfileChangeFromExternal()
@@ -401,13 +313,83 @@ void CheckForProfileChangeFromInternal()
 			if (_wcsicmp(_lastfoundprofile.c_str(), tmpstring.c_str()))
 			{
 				_lastfoundprofile = tmpstring;
-				ExecuteProcess(CHANGE_COLOR_PROFILE_PATH, _lastfoundprofile, 2);
+				ChangeColorProfile(_lastfoundprofile);
 			}
 		}
 
 		RegNotifyChangeKeyValue(profileKey, false, REG_NOTIFY_CHANGE_LAST_SET | REG_NOTIFY_CHANGE_NAME | REG_NOTIFY_CHANGE_ATTRIBUTES | REG_NOTIFY_CHANGE_SECURITY, hEvent, true);
 	}
 }
+
+void ChangeColorProfileNightLight(double value)
+{
+	const std::wstring profileName = L"Night light.icm";
+	RegSetValueEx(colorAndLightKey, L"UserSettingSelectedProfile", NULL, REG_SZ, LPBYTE(profileName.c_str()), (profileName.size() + 1) * sizeof(wchar_t));
+
+	std::wstring valstr = std::to_wstring(value);
+	RegSetValueEx(colorAndLightKey, L"UserSettingNightLightWat", NULL, REG_SZ, LPBYTE(valstr.c_str()), (valstr.size() + 1) * sizeof(wchar_t));
+
+	const Profile prof = Profile::GetNightLightProfile(value);
+	prof.ApplyProfile(colorAndLightKey);
+}
+
+void ChangeColorProfile(std::wstring lastprofile)
+{
+	Profile::SetValue(colorAndLightKey, L"UserSettingSelectedProfile", lastprofile);
+	ProvisionProfileListData();
+
+	if (lastprofile == L"Standard.icm")
+	{
+		const Profile prof = Profile::GetDefault();
+		prof.ApplyProfile(colorAndLightKey);
+	}
+	else if (lastprofile == L"Vivid.icm")
+	{
+		const Profile prof = Profile::GetVivid();
+		prof.ApplyProfile(colorAndLightKey);
+	}
+	else if (lastprofile == L"Cool.icm")
+	{
+		const Profile prof = Profile::GetCool();
+		prof.ApplyProfile(colorAndLightKey);
+	}
+	else if (lastprofile == L"Advanced.icm")
+	{
+		int saturation = 0;
+		int tint = 0;
+		int temp = 0;
+
+		unsigned long dwData = 0;
+		unsigned long cbData = sizeof(unsigned long);
+
+		long err = RegQueryValueEx(colorAndLightKey, L"UserSettingAdvancedSaturation", 0, 0, LPBYTE(&dwData), &cbData);
+
+		if (err == ERROR_SUCCESS)
+			saturation = dwData;
+		else
+			saturation = 25;
+
+		err = RegQueryValueEx(colorAndLightKey, L"UserSettingAdvancedTint", 0, 0, LPBYTE(&dwData), &cbData);
+
+		if (err == ERROR_SUCCESS)
+			tint = dwData;
+		else
+			tint = 50;
+
+		err = RegQueryValueEx(colorAndLightKey, L"UserSettingAdvancedTemperature", 0, 0, LPBYTE(&dwData), &cbData);
+
+		if (err == ERROR_SUCCESS)
+			temp = dwData;
+		else
+			temp = 50;
+
+		
+		const auto prof = Profile::GenerateAdvancedProfile(temp, tint, saturation);
+		prof.ApplyProfile(colorAndLightKey);
+	}
+}
+
+//NIGHT MODE RELATED SETTINGS -- TODO --
 
 void CheckForSettings()
 {
@@ -467,14 +449,30 @@ void ChangedEventSignal()
 
 		int value = 0;
 
-		//if (isPreviewing)
-		//{
-		//	value = (dwSettingsArray[offsetVal] << 8) | dwSettingsArray[offsetVal - 1];
-		//}
-		//else
-		//{
-			value = (dwSettingsArray[offsetVal + 3] << 8) | dwSettingsArray[offsetVal + 2];
-		//}
+		/*
+		    WARNING: For whom it may concern, this is currently unexplainable.
+
+			For some extraordinary reason, on some devices the slider value is
+			storred using an offset of 0 bytes in the data buffer.
+			On all of my devices this offset is set to 2, for Abdel (@ADeltaX)
+			it's set to 0. I think given the structure of the buffer having an
+			offset of 2 is actually expected and normal behavior, and not
+			having one is an oddity no one can explain.
+
+			If you're having issues with the value being stuck, you now know
+			what to do.
+		*/
+
+		int offset = 2;
+
+		if (isPreviewing)
+		{
+			value = int((unsigned char)(0) << 24 | (unsigned char)(0) << 16 | dwSettingsArray[offsetVal + offset] << 8 | dwSettingsArray[offsetVal + offset - 1]);
+		}
+		else
+		{
+			value = int((unsigned char)(0) << 24 | (unsigned char)(0) << 16 | dwSettingsArray[offsetVal + offset + 3] << 8 | dwSettingsArray[offsetVal + offset + 2]);
+		}
 
 		bool isEnabled = dwStateArray[18] == 21;
 
@@ -499,7 +497,6 @@ void NewStatus(bool isEnabled, bool isPreviewing, int valueSlider)
 		else
 		{
 			NightModeDisabled();
-			return; //No need to continue with the other code.
 		}
 	}
 

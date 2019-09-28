@@ -228,6 +228,10 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="ColorProfileListener.cpp" />
+    <ClCompile Include="Profile.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Profile.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
