@@ -247,7 +247,7 @@ int main()
 	RegOpenKeyEx(HKEY_CURRENT_USER, BLUELIGHT_REDUCTION_STATE_KEY_PATH, 0, KEY_NOTIFY | KEY_READ, &bluelightreductionStateKey);
 
 	RegOpenKeyEx(HKEY_CURRENT_USER, PROFILE_KEY_PATH, 0, KEY_ALL_ACCESS, &profileKey);
-	RegOpenKeyEx(HKEY_LOCAL_MACHINE, COLOR_AND_LIGHT_KEY_PATH, 0, KEY_ALL_ACCESS | KEY_WRITE, &colorAndLightKey);
+	RegOpenKeyEx(HKEY_LOCAL_MACHINE, COLOR_AND_LIGHT_KEY_PATH, 0, KEY_ALL_ACCESS, &colorAndLightKey);
 
 	ChangedEventSignal();
 
@@ -313,6 +313,28 @@ void CheckForProfileChangeFromInternal()
 			if (_wcsicmp(_lastfoundprofile.c_str(), tmpstring.c_str()))
 			{
 				_lastfoundprofile = tmpstring;
+
+				if (_lastfoundprofile == L"Standard.icm")
+				{
+					const wchar_t sz[] = L"Advanced.icm\0Cool.icm\0Vivid.icm\0Standard.icm\0";
+					RegSetValueEx(profileKey, L"ICMProfileBackup", NULL, REG_MULTI_SZ, (LPBYTE)sz, sizeof(sz));
+				}
+				if (_lastfoundprofile == L"Vivid.icm")
+				{
+					const wchar_t sz[] = L"Standard.icm\0Advanced.icm\0Cool.icm\0Vivid.icm\0";
+					RegSetValueEx(profileKey, L"ICMProfileBackup", NULL, REG_MULTI_SZ, (LPBYTE)sz, sizeof(sz));
+				}
+				if (_lastfoundprofile == L"Cool.icm")
+				{
+					const wchar_t sz[] = L"Vivid.icm\0Standard.icm\0Advanced.icm\0Cool.icm\0";
+					RegSetValueEx(profileKey, L"ICMProfileBackup", NULL, REG_MULTI_SZ, (LPBYTE)sz, sizeof(sz));
+				}
+				if (_lastfoundprofile == L"Advanced.icm")
+				{
+					const wchar_t sz[] = L"Cool.icm\0Vivid.icm\0Standard.icm\0Advanced.icm\0";
+					RegSetValueEx(profileKey, L"ICMProfileBackup", NULL, REG_MULTI_SZ, (LPBYTE)sz, sizeof(sz));
+				}
+
 				ChangeColorProfile(_lastfoundprofile);
 			}
 		}
@@ -325,9 +347,6 @@ void ChangeColorProfileNightLight(double value)
 {
 	const std::wstring profileName = L"Night light.icm";
 	RegSetValueEx(colorAndLightKey, L"UserSettingSelectedProfile", NULL, REG_SZ, LPBYTE(profileName.c_str()), (profileName.size() + 1) * sizeof(wchar_t));
-
-	std::wstring valstr = std::to_wstring(value);
-	RegSetValueEx(colorAndLightKey, L"UserSettingNightLightWat", NULL, REG_SZ, LPBYTE(valstr.c_str()), (valstr.size() + 1) * sizeof(wchar_t));
 
 	const Profile prof = Profile::GetNightLightProfile(value);
 	prof.ApplyProfile(colorAndLightKey);
