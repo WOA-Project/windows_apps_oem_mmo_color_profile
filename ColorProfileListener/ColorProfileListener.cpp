@@ -469,7 +469,7 @@ void ChangedEventSignal()
 		int value = 0;
 
 		/*
-		    WARNING: For whom it may concern, this is currently unexplainable.
+			WARNING: To whom it may concern, this is currently unexplainable.
 
 			For some extraordinary reason, on some devices the slider value is
 			storred using an offset of 0 bytes in the data buffer.
@@ -478,19 +478,30 @@ void ChangedEventSignal()
 			offset of 2 is actually expected and normal behavior, and not
 			having one is an oddity no one can explain.
 
-			If you're having issues with the value being stuck, you now know
-			what to do.
+			This should clear up the confusion as to why we check for that
+			particular 0x28CF value.
 		*/
 
-		int offset = 2;
+		int offset = 0;
 
 		if (isPreviewing)
 		{
 			value = int((unsigned char)(0) << 24 | (unsigned char)(0) << 16 | dwSettingsArray[offsetVal + offset] << 8 | dwSettingsArray[offsetVal + offset - 1]);
+
+			if (value == 0x28CF)
+			{
+				offset = 2;
+				value = int((unsigned char)(0) << 24 | (unsigned char)(0) << 16 | dwSettingsArray[offsetVal + offset] << 8 | dwSettingsArray[offsetVal + offset - 1]);
+			}
 		}
 		else
 		{
 			value = int((unsigned char)(0) << 24 | (unsigned char)(0) << 16 | dwSettingsArray[offsetVal + offset + 3] << 8 | dwSettingsArray[offsetVal + offset + 2]);
+			if (value == 0x28CF)
+			{
+				offset = 2;
+				value = int((unsigned char)(0) << 24 | (unsigned char)(0) << 16 | dwSettingsArray[offsetVal + offset + 3] << 8 | dwSettingsArray[offsetVal + offset + 2]);
+			}
 		}
 
 		bool isEnabled = dwStateArray[18] == 21;
