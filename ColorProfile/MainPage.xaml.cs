@@ -1,11 +1,12 @@
 ﻿using System;
-using Windows.Storage;
+using Windows.ApplicationModel.Core;
+using Windows.UI;
+using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
+using Windows.Storage;
 using RegistryRT;
-
-// The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
 
 namespace ColorProfile
 {
@@ -31,6 +32,9 @@ namespace ColorProfile
 
             Window.Current.SizeChanged += Current_SizeChanged;
             Loaded += MainPage_Loaded;
+            CoreApplication.GetCurrentView().TitleBar.ExtendViewIntoTitleBar = true;
+            ApplicationView.GetForCurrentView().TitleBar.ButtonBackgroundColor = Colors.Transparent;
+            ApplicationView.GetForCurrentView().TitleBar.ButtonInactiveBackgroundColor = Colors.Transparent;
         }
 
         private void SetValue(string name, int value)
