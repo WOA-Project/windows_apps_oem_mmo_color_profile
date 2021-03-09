@@ -36,7 +36,7 @@
         AppListEntry="none"
         DisplayName="Color Profile"
         Square150x150Logo="Assets\Square150x150Logo.png"
-        Square44x44Logo="Assets\AppIcon.png"
+        Square44x44Logo="Assets\Square44x44Logo.png"
         Description="Color Profile"
         BackgroundColor="transparent">
         <uap:DefaultTile Wide310x150Logo="Assets\Wide310x150Logo.png" Square71x71Logo="Assets\SmallTile.png" Square310x310Logo="Assets\LargeTile.png" ShortName="Color Profile">
@@ -51,7 +51,17 @@
 
       <Extensions>
         <rescap:Extension Category="windows.settingsApp">
-          <rescap:SettingsApp Category="extras"/>
+          <rescap:SettingsApp SettingsPageUri="ms-settings:display">
+            <rescap:AppLinks>
+              <rescap:Link AppActivationMode="main" DisplayName="Tune display color profile"/>
+            </rescap:AppLinks>
+            <rescap:SearchTerms>
+              <rescap:Term>Color</rescap:Term>
+              <rescap:Term>Color Profile</rescap:Term>
+              <rescap:Term>Profile</rescap:Term>
+              <rescap:Term>Panel</rescap:Term>
+            </rescap:SearchTerms>
+          </rescap:SettingsApp>
         </rescap:Extension>
       </Extensions>
     </Application>
