@@ -300,7 +300,7 @@ Platform::Boolean Registry::IsKeyHidden(RegistryHive Hive, Platform::String^ Key
 	return TRUE;
 }
 
-Platform::Boolean Registry::FindHiddenKeys(RegistryHive Hive, Platform::String^ Key, Platform::Array<Platform::String^> ^*csaSubkeys)
+Platform::Boolean Registry::FindHiddenKeys(RegistryHive Hive, Platform::String^ Key, Platform::Array<Platform::String^>^* csaSubkeys)
 {
 	String^ hivepath = GetRootPathFor(Hive);
 
@@ -327,7 +327,7 @@ Platform::Boolean Registry::FindHiddenKeys(RegistryHive Hive, Platform::String^ 
 		CHAR szSubkeyInfo[1024];
 		UINT i = 0;
 
-		Platform::String^ csSubkey, ^csNewSubkey;
+		Platform::String^ csSubkey, ^ csNewSubkey;
 
 		std::vector<Platform::String^> Subkeys;
 
@@ -398,10 +398,10 @@ Platform::Boolean Registry::QueryValue(RegistryHive Hive, Platform::String^ Key,
 	UNICODE_STRING ValueName;
 	RtlInitUnicodeString(&ValueName, cName);
 
-	BYTE *Buffer;
+	BYTE* Buffer;
 	DWORD dwDataSize = 0;
 
-	KEY_VALUE_PARTIAL_INFORMATION *info;
+	KEY_VALUE_PARTIAL_INFORMATION* info;
 
 	m_NtStatus = STATUS_SUCCESS;
 
@@ -450,7 +450,7 @@ Platform::Boolean Registry::QueryValue(RegistryHive Hive, Platform::String^ Key,
 		return FALSE;
 	}
 
-	info = (KEY_VALUE_PARTIAL_INFORMATION *)Buffer;
+	info = (KEY_VALUE_PARTIAL_INFORMATION*)Buffer;
 
 	NtClose(hKey);
 
@@ -500,10 +500,10 @@ Platform::Boolean Registry::QueryValue(RegistryHive Hive, Platform::String^ Key,
 	UNICODE_STRING ValueName;
 	RtlInitUnicodeString(&ValueName, cName);
 
-	BYTE *Buffer;
+	BYTE* Buffer;
 	DWORD dwDataSize = 0;
 
-	KEY_VALUE_PARTIAL_INFORMATION *info;
+	KEY_VALUE_PARTIAL_INFORMATION* info;
 
 	m_NtStatus = STATUS_SUCCESS;
 
@@ -552,7 +552,7 @@ Platform::Boolean Registry::QueryValue(RegistryHive Hive, Platform::String^ Key,
 		return FALSE;
 	}
 
-	info = (KEY_VALUE_PARTIAL_INFORMATION *)Buffer;
+	info = (KEY_VALUE_PARTIAL_INFORMATION*)Buffer;
 
 	NtClose(hKey);
 
@@ -617,7 +617,7 @@ BOOL Registry::ReadValue(RegistryHive Hive, Platform::String^ Key, Platform::Str
 	//
 	WCHAR infoBuffer[256];
 	memset(infoBuffer, 0, 256);
-	*retInfo = (KEY_VALUE_PARTIAL_INFORMATION *)infoBuffer;
+	*retInfo = (KEY_VALUE_PARTIAL_INFORMATION*)infoBuffer;
 
 	m_NtStatus = NtQueryValueKey(hKey,
 		&ValueName,
@@ -696,7 +696,7 @@ RegistryRT:ULONG dwType = 0;
 	//
 	WCHAR infoBuffer[256];
 	memset(infoBuffer, 0, 256);
-	*retInfo = (KEY_VALUE_PARTIAL_INFORMATION *)infoBuffer;
+	*retInfo = (KEY_VALUE_PARTIAL_INFORMATION*)infoBuffer;
 
 	m_NtStatus = NtQueryValueKey(hKey,
 		&ValueName,
@@ -751,10 +751,10 @@ RegistryType Registry::GetValueInfo(RegistryHive Hive, Platform::String^ Key, Pl
 	UNICODE_STRING ValueName;
 	RtlInitUnicodeString(&ValueName, cName);
 
-	BYTE *Buffer;
+	BYTE* Buffer;
 	DWORD dwDataSize = 0;
 
-	KEY_VALUE_FULL_INFORMATION *info;
+	KEY_VALUE_FULL_INFORMATION* info;
 
 	NTSTATUS m_NtStatus = STATUS_SUCCESS;
 
@@ -790,7 +790,7 @@ RegistryType Registry::GetValueInfo(RegistryHive Hive, Platform::String^ Key, Pl
 
 	}
 
-	info = (KEY_VALUE_FULL_INFORMATION *)Buffer;
+	info = (KEY_VALUE_FULL_INFORMATION*)Buffer;
 
 	NtClose(hKey);
 
@@ -833,10 +833,10 @@ unsigned int Registry::GetValueInfo2(RegistryHive Hive, Platform::String^ Key, P
 	UNICODE_STRING ValueName;
 	RtlInitUnicodeString(&ValueName, cName);
 
-	BYTE *Buffer;
+	BYTE* Buffer;
 	DWORD dwDataSize = 0;
 
-	KEY_VALUE_FULL_INFORMATION *info;
+	KEY_VALUE_FULL_INFORMATION* info;
 
 	NTSTATUS m_NtStatus = STATUS_SUCCESS;
 
@@ -872,7 +872,7 @@ unsigned int Registry::GetValueInfo2(RegistryHive Hive, Platform::String^ Key, P
 
 	}
 
-	info = (KEY_VALUE_FULL_INFORMATION *)Buffer;
+	info = (KEY_VALUE_FULL_INFORMATION*)Buffer;
 
 	NtClose(hKey);
 
@@ -978,7 +978,7 @@ Platform::Boolean Registry::ValueExists(RegistryHive Hive, Platform::String^ Key
 	return TRUE;
 }
 
-Platform::Boolean Registry::GetKeyLastWriteTime(RegistryHive Hive, Platform::String^ Key, int64 *LastWriteTime)
+Platform::Boolean Registry::GetKeyLastWriteTime(RegistryHive Hive, Platform::String^ Key, int64* LastWriteTime)
 {
 	String^ hivepath = GetRootPathFor(Hive);
 
@@ -1011,7 +1011,7 @@ Platform::Boolean Registry::GetKeyLastWriteTime(RegistryHive Hive, Platform::Str
 	}
 
 	WCHAR buffer[256];
-	KEY_BASIC_INFORMATION *info = (KEY_BASIC_INFORMATION *)buffer;
+	KEY_BASIC_INFORMATION* info = (KEY_BASIC_INFORMATION*)buffer;
 
 	DWORD dwResultLength;
 	m_NtStatus = NtQueryKey(hKey,
@@ -1044,7 +1044,7 @@ Platform::Boolean Registry::GetKeyLastWriteTime(RegistryHive Hive, Platform::Str
 	return TRUE;
 }
 
-Platform::Boolean Registry::GetSubKeyList(RegistryHive Hive, Platform::String^ Key, Platform::Array<Platform::String^> ^*csaSubkeys)
+Platform::Boolean Registry::GetSubKeyList(RegistryHive Hive, Platform::String^ Key, Platform::Array<Platform::String^>^* csaSubkeys)
 {
 	String^ hivepath = GetRootPathFor(Hive);
 
@@ -1085,7 +1085,7 @@ Platform::Boolean Registry::GetSubKeyList(RegistryHive Hive, Platform::String^ K
 	while ((m_NtStatus = NtEnumerateKey(hKey, i, KeyBasicInformation, szKeyInfo, sizeof(szKeyInfo), &resultLength)) == STATUS_SUCCESS)
 	{
 		PKEY_BASIC_INFORMATION tInfo = (PKEY_BASIC_INFORMATION)szKeyInfo;
-		String ^curstr = ref new String(tInfo->Name, tInfo->NameLength / 2);
+		String^ curstr = ref new String(tInfo->Name, tInfo->NameLength / 2);
 		Subkeys.push_back(curstr);
 		i++;
 	}
@@ -1102,7 +1102,7 @@ Platform::Boolean Registry::GetSubKeyList(RegistryHive Hive, Platform::String^ K
 	return TRUE;
 }
 
-Platform::Boolean Registry::GetValueList(RegistryHive Hive, Platform::String^ Key, Platform::Array<Platform::String^> ^*csaValues)
+Platform::Boolean Registry::GetValueList(RegistryHive Hive, Platform::String^ Key, Platform::Array<Platform::String^>^* csaValues)
 {
 	String^ hivepath = GetRootPathFor(Hive);
 
@@ -1144,7 +1144,7 @@ Platform::Boolean Registry::GetValueList(RegistryHive Hive, Platform::String^ Ke
 	while ((NtStatus = NtEnumerateValueKey(hKey, i, KeyValueBasicInformation, szValueInfo, sizeof(szValueInfo), &resultLength)) == STATUS_SUCCESS)
 	{
 		PKEY_VALUE_BASIC_INFORMATION tInfo = (PKEY_VALUE_BASIC_INFORMATION)szValueInfo;
-		String ^curstr = ref new String(tInfo->Name, tInfo->NameLength / 2);
+		String^ curstr = ref new String(tInfo->Name, tInfo->NameLength / 2);
 		Subkeys.push_back(curstr);
 		i++;
 	}
@@ -1271,7 +1271,7 @@ Platform::Boolean Registry::WriteValue(RegistryHive Hive, Platform::String^ Key,
 	// I do this (new and delete []) because I was getting
 	// a lot of extra characters in the data (in the registry).
 	//
-	UCHAR *puc = new UCHAR[ulValueLength];
+	UCHAR* puc = new UCHAR[ulValueLength];
 	memset(puc, 0, ulValueLength);
 	memcpy(puc, pValue, ulValueLength);
 
@@ -1348,7 +1348,7 @@ Platform::Boolean Registry::WriteValue(RegistryHive Hive, Platform::String^ Key,
 	// I do this (new and delete []) because I was getting
 	// a lot of extra characters in the data (in the registry).
 	//
-	UCHAR *puc = new UCHAR[ulValueLength];
+	UCHAR* puc = new UCHAR[ulValueLength];
 	memset(puc, 0, ulValueLength);
 	memcpy(puc, pValue, ulValueLength);
 
@@ -1534,7 +1534,7 @@ Platform::Boolean Registry::DeleteKeysRecursive(RegistryHive Hive, Platform::Str
 	ULONG resultLength;
 	CHAR szSubkeyInfo[1024];
 
-	Platform::String^ csSubkey, ^csNewSubkey;
+	Platform::String^ csSubkey, ^ csNewSubkey;
 
 	// Had trouble with
 	// Key was opened OK, now let's scan for subkeys

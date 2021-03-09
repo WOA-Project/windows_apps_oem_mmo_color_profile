@@ -8,6 +8,13 @@
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
+    <Page.Resources>
+        <local:IntegerIsThreeToBooleanConverter x:Key="IntegerIsThreeToBooleanConverter" />
+        <local:IntegerIsNotThreeToBooleanConverter x:Key="IntegerIsNotThreeToBooleanConverter" />
+        <local:IntegerIsFourToBooleanConverter x:Key="IntegerIsFourToBooleanConverter" />
+        <local:IntegerIsNotFourToBooleanConverter x:Key="IntegerIsNotFourToBooleanConverter" />
+    </Page.Resources>
+
     <ScrollViewer VerticalScrollBarVisibility="Auto" VerticalScrollMode="Auto">
         <StackPanel>
             <StackPanel Padding="24,56,24,0">
@@ -33,7 +40,7 @@
                     <ColumnDefinition Width="auto"/>
                 </Grid.ColumnDefinitions>
 
-                <ToggleSwitch x:Name="SunlightReadabilityToggle" Grid.Column="1" OnContent="" OffContent="" Width="50" Toggled="SunlightReadabilityToggle_Toggled"/>
+                <ToggleSwitch x:Name="SunlightReadabilityToggle" Grid.Column="1" OnContent="" OffContent="" Width="50" IsOn="{x:Bind ViewModel.SunlightReadability, Mode=TwoWay}"/>
 
                 <StackPanel Grid.Column="0" Margin="0,0,32,0">
                     <TextBlock Text="Sunlight readability"/>
@@ -47,7 +54,7 @@
                     <ColumnDefinition Width="auto"/>
                 </Grid.ColumnDefinitions>
 
-                <ToggleSwitch x:Name="BatterySaverBrightnessToggle" Grid.Column="1" OnContent="" OffContent="" Width="50" Toggled="BatterySaverBrightnessToggle_Toggled"/>
+                <ToggleSwitch x:Name="BatterySaverBrightnessToggle" Grid.Column="1" OnContent="" OffContent="" Width="50" IsOn="{x:Bind ViewModel.BatterySaverBrightness, Mode=TwoWay}"/>
 
                 <StackPanel Grid.Column="0" Margin="0,0,32,0">
                     <TextBlock Text="Battery saver brightness"/>
@@ -64,10 +71,10 @@
 
             <StackPanel>
                 <ScrollViewer x:Name="ImageViewScrollViewer"
-            ManipulationMode="TranslateX"
-            IsHitTestVisible="True"
-            HorizontalScrollBarVisibility="Hidden"
-            VerticalScrollBarVisibility="Disabled">
+                              ManipulationMode="TranslateX"
+                              IsHitTestVisible="True"
+                              HorizontalScrollBarVisibility="Hidden"
+                              VerticalScrollBarVisibility="Disabled">
                     <ScrollViewer.Content>
                         <Grid x:Name="ImageView">
                             <Grid.ColumnDefinitions>
@@ -95,19 +102,20 @@
             </StackPanel>
 
             <StackPanel Padding="24">
-                <ComboBox x:Name="ProfileSelector" Header="Color profile" HorizontalAlignment="Stretch" SelectedIndex="0" SelectionChanged="ComboBox_SelectionChanged">
+                <ComboBox x:Name="ProfileSelector" Header="Color profile" HorizontalAlignment="Stretch" SelectedIndex="{x:Bind ViewModel.Profile, Mode=TwoWay}" IsEnabled="{x:Bind ViewModel.Profile, Mode=OneWay, Converter={StaticResource IntegerIsNotFourToBooleanConverter}}">
                     <ComboBoxItem Content="Standard"/>
                     <ComboBoxItem Content="Vivid"/>
                     <ComboBoxItem Content="Cool"/>
                     <ComboBoxItem Content="Advanced"/>
+                    <ComboBoxItem x:Name="ComboBoxNightLightItem" Content="Night light" x:Load="{x:Bind ViewModel.Profile, Mode=OneWay, Converter={StaticResource IntegerIsFourToBooleanConverter}}"/>
                 </ComboBox>
             </StackPanel>
 
-            <StackPanel x:Name="AdvancedSliderPanel" Visibility="Collapsed">
+            <StackPanel x:Name="AdvancedSliderPanel" x:Load="{x:Bind ProfileSelector.SelectedIndex, Mode=OneWay, Converter={StaticResource IntegerIsThreeToBooleanConverter}}">
                 <StackPanel Padding="24,0">
                     <TextBlock Text="Color temperature"/>
                     <Grid>
-                        <Slider x:Name="TemperatureSlider" ValueChanged="TemperatureSlider_ValueChanged" Margin="0,0,0,2" ManipulationMode="All" IsThumbToolTipEnabled="False" Maximum="100" Minimum="0" Value="50"/>
+                        <Slider x:Name="TemperatureSlider" Margin="0,0,0,2" ManipulationMode="All" IsThumbToolTipEnabled="False" Maximum="100" Minimum="0" Value="{x:Bind ViewModel.Temperature, Mode=TwoWay}"/>
                     </Grid>
                     <Grid HorizontalAlignment="Stretch" Margin="0,4,0,20">
                         <TextBlock HorizontalAlignment="Left" Text="Warm"/>
@@ -119,7 +127,7 @@
                 <StackPanel Padding="24,0">
                     <TextBlock Text="Tint"/>
                     <Grid>
-                        <Slider x:Name="TintSlider" ValueChanged="TintSlider_ValueChanged" Margin="0,0,0,2" ManipulationMode="All" IsThumbToolTipEnabled="False" Maximum="100" Minimum="0" Value="50"/>
+                        <Slider x:Name="TintSlider" Margin="0,0,0,2" ManipulationMode="All" IsThumbToolTipEnabled="False" Maximum="100" Minimum="0" Value="{x:Bind ViewModel.Tint, Mode=TwoWay}"/>
                     </Grid>
                     <Grid HorizontalAlignment="Stretch" Margin="0,4,0,20">
                         <TextBlock HorizontalAlignment="Left" Text="Green"/>
@@ -131,7 +139,7 @@
                 <StackPanel Padding="24,0">
                     <TextBlock Text="Color saturation"/>
                     <Grid>
-                        <Slider x:Name="SaturationSlider" ValueChanged="SaturationSlider_ValueChanged" Margin="0,0,0,2" ManipulationMode="All" IsThumbToolTipEnabled="False" Maximum="100" Minimum="0" Value="25"/>
+                        <Slider x:Name="SaturationSlider" Margin="0,0,0,2" ManipulationMode="All" IsThumbToolTipEnabled="False" Maximum="100" Minimum="0" Value="{x:Bind ViewModel.Saturation, Mode=TwoWay}"/>
                     </Grid>
                     <Grid HorizontalAlignment="Stretch" Margin="0,4,0,20">
                         <TextBlock HorizontalAlignment="Left" Text="Natural"/>

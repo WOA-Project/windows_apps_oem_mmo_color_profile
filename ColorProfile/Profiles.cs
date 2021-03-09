@@ -23,9 +23,8 @@ namespace ColorProfile
         public double UserSettingColorTargetWhiteY { get; set; }
         public double UserSettingColorTargetWhiteZ { get; set; }
 
-        // Currently broken
-        public int UserSettingColorSaturationMatrix { get; set; }
-        public int UserSettingColorSaturationPA { get; set; }
+        public uint UserSettingColorSaturationMatrix { get; set; }
+        public uint UserSettingColorSaturationPA { get; set; }
 
         private string key = @"SOFTWARE\OEM\Nokia\Display\ColorAndLight";
 
@@ -39,20 +38,9 @@ namespace ColorProfile
             regrt.WriteValue(RegistryHive.HKEY_LOCAL_MACHINE, key, name, System.Text.Encoding.Unicode.GetBytes(Math.Round(value, 6).ToString() + "\0"), RegistryType.String);
         }
 
-        private void SetValue(string name, int value)
+        private void SetValue(string name, uint value)
         {
             regrt.WriteValue(RegistryHive.HKEY_LOCAL_MACHINE, key, name, BitConverter.GetBytes(value), RegistryType.Integer);
-        }
-
-        private int GetValueInt(string name)
-        {
-            RegistryType type;
-            byte[] buffer;
-
-            regrt.QueryValue(RegistryHive.HKEY_LOCAL_MACHINE, key, name, out type, out buffer);
-            if (buffer == null)
-                return 0;
-            return BitConverter.ToInt32(buffer, 0);
         }
 
         public void ApplyProfile()
@@ -73,10 +61,11 @@ namespace ColorProfile
             SetValue("UserSettingColorTargetWhiteY", UserSettingColorTargetWhiteY);
             SetValue("UserSettingColorTargetWhiteZ", UserSettingColorTargetWhiteZ);
 
-            //SetValue("UserSettingColorSaturationMatrix", UserSettingColorSaturationMatrix);
-            //SetValue("UserSettingColorSaturationPA", UserSettingColorSaturationPA);
+            SetValue("UserSettingColorSaturationMatrix", UserSettingColorSaturationMatrix);
+            SetValue("UserSettingColorSaturationPA", UserSettingColorSaturationPA);
 
-            SetValue("UserSettingAtomicUpdate", GetValueInt("UserSettingAtomicUpdate") == 1 ? 0 : 1);
+            SetValue("UserSettingAtomicUpdate", 1u);
+            SetValue("UserSettingAtomicUpdate", 0u);
         }
     }
 
