@@ -43,6 +43,27 @@ namespace ColorProfile
             regrt.WriteValue(RegistryHive.HKEY_LOCAL_MACHINE, key, name, BitConverter.GetBytes(value), RegistryType.Integer);
         }
 
+        private bool GetRegistry(string ValueName, out uint ValueData)
+        {
+            ValueData = 0;
+            byte[] buffer;
+
+            bool status = regrt.QueryValue(
+                RegistryHive.HKEY_LOCAL_MACHINE,
+                key,
+                ValueName,
+                out RegistryType type,
+                out buffer
+            );
+
+            if (status && type == RegistryType.Integer)
+            {
+                ValueData = BitConverter.ToUInt32(buffer, 0);
+            }
+
+            return status;
+        }
+
         public void ApplyProfile()
         {
             SetValue("UserSettingColorTargetBlueX", UserSettingColorTargetBlueX);
@@ -64,8 +85,9 @@ namespace ColorProfile
             SetValue("UserSettingColorSaturationMatrix", UserSettingColorSaturationMatrix);
             SetValue("UserSettingColorSaturationPA", UserSettingColorSaturationPA);
 
-            SetValue("UserSettingAtomicUpdate", 1u);
-            SetValue("UserSettingAtomicUpdate", 0u);
+            uint val = 0u;
+            GetRegistry("UserSettingAtomicUpdate", out val);
+            SetValue("UserSettingAtomicUpdate", val == 1u ? 0u : 1u);
         }
     }
 
