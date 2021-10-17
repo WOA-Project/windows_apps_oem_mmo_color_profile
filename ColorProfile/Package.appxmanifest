@@ -10,7 +10,7 @@
   <Identity
     Name="LumiaWOA.ColorProfile"
     Publisher="CN=Windows On Lumia Development Second Party Software 2020"
-    Version="1.0.35.0" />
+    Version="1.0.37.0" />
 
   <mp:PhoneIdentity PhoneProductId="d5b54bf0-1052-4b21-b6b9-2dba508d8277" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 
